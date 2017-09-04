@@ -11,6 +11,7 @@ import {
   TouchableHighlight,
   Alert
 } from "react-native";
+import { LinearGradient } from "expo";
 
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
 
@@ -25,7 +26,10 @@ const SLIDES = [
     shoePhrase: "Air",
     backgroundColor: "#8850FF",
     touchableBackgroundColor: "#CAB1FF",
-    gradient: require("./gradient1.png")
+    gradients: {
+      gradient1: "#F72648",
+      gradient2: "#FCCC3C"
+    }
   },
   {
     shoeImage: require("./shoe2.png"),
@@ -37,7 +41,10 @@ const SLIDES = [
     shoePhrase: "Class",
     backgroundColor: "#FFBA00",
     touchableBackgroundColor: "#FFDB79",
-    gradient: require("./gradient2.png")
+    gradients: {
+      gradient1: "#3CA3FC",
+      gradient2: "#FFD300"
+    }
   },
   {
     shoeImage: require("./shoe3.png"),
@@ -49,7 +56,10 @@ const SLIDES = [
     shoePhrase: "Safar",
     backgroundColor: "#4054FF",
     touchableBackgroundColor: "#9EA8FF",
-    gradient: require("./gradient3.png")
+    gradients: {
+      gradient1: "#26C9F7",
+      gradient2: "#DFFC3C"
+    }
   }
 ];
 
@@ -67,13 +77,21 @@ export default class App extends Component {
           return (
             <Animated.View
               key={index}
+              shouldRasterizeIOS
+              renderToHardwareTextureAndroid
               style={{
                 ...StyleSheet.absoluteFillObject,
                 backgroundColor: slide.backgroundColor,
                 zIndex: -index,
+                elevation: -index,
                 opacity: this.scrollX.interpolate({
-                  inputRange: [deviceWidth * index, deviceWidth * (index + 1)],
-                  outputRange: [1, 0]
+                  inputRange: [
+                    deviceWidth * (index - 1),
+                    deviceWidth * index,
+                    deviceWidth * (index + 1)
+                  ],
+                  outputRange: [0, 1, 0],
+                  extrapolate: "clamp"
                 })
               }}
             />
@@ -94,81 +112,113 @@ export default class App extends Component {
               <View key={index} style={styles.cardContainer}>
                 <Animated.View style={styles.card}>
                   <View style={styles.cardTopContainer}>
-                    <Image
-                      style={styles.gradientImage}
-                      source={slide.gradient}
-                    />
-                    <Animated.View
-                      style={[
-                        styles.nikeImageContainer,
-                        {
+                    <LinearGradient
+                      shouldRasterizeIOS
+                      renderToHardwareTextureAndroid
+                      style={styles.gradient}
+                      colors={[
+                        slide.gradients.gradient1,
+                        slide.gradients.gradient2
+                      ]}
+                    >
+                      <Animated.View
+                        shouldRasterizeIOS
+                        renderToHardwareTextureAndroid
+                        style={[
+                          styles.nikeImageContainer,
+                          {
+                            transform: [
+                              {
+                                translateX: this.scrollX.interpolate({
+                                  inputRange: [
+                                    deviceWidth * (index - 1),
+                                    deviceWidth * index,
+                                    deviceWidth * (index + 1)
+                                  ],
+                                  outputRange: [
+                                    deviceWidth * 0.2,
+                                    0,
+                                    -deviceWidth * 0.2
+                                  ],
+                                  extrapolate: "clamp"
+                                })
+                              }
+                            ]
+                          }
+                        ]}
+                      >
+                        <Image
+                          style={styles.nikeImage}
+                          source={require("./nike-logo.png")}
+                        />
+                        <Text style={styles.shoePriceText}>
+                          ${slide.shoePrice}
+                        </Text>
+                      </Animated.View>
+                      <Animated.View
+                        shouldRasterizeIOS
+                        renderToHardwareTextureAndroid
+                        style={{
+                          marginBottom: 8,
                           transform: [
                             {
                               translateX: this.scrollX.interpolate({
                                 inputRange: [
+                                  deviceWidth * (index - 1),
                                   deviceWidth * index,
                                   deviceWidth * (index + 1)
                                 ],
-                                outputRange: [0, -deviceWidth * 0.2]
+                                outputRange: [
+                                  deviceWidth * 0.4,
+                                  0,
+                                  -deviceWidth * 0.4
+                                ],
+                                extrapolate: "clamp"
                               })
                             }
                           ]
-                        }
-                      ]}
-                    >
-                      <Image
-                        style={styles.nikeImage}
-                        source={require("./nike-logo.png")}
-                      />
-                      <Text style={styles.shoePriceText}>
-                        ${slide.shoePrice}
+                        }}
+                      >
+                        <Text style={styles.shoeNameText}>
+                          {slide.shoeName.toUpperCase()}
+                        </Text>
+                      </Animated.View>
+                      <Animated.View
+                        shouldRasterizeIOS
+                        renderToHardwareTextureAndroid
+                        style={{
+                          transform: [
+                            {
+                              translateX: this.scrollX.interpolate({
+                                inputRange: [
+                                  deviceWidth * (index - 1),
+                                  deviceWidth * index,
+                                  deviceWidth * (index + 1)
+                                ],
+                                outputRange: [
+                                  deviceWidth * 0.6,
+                                  0,
+                                  -deviceWidth * 0.6
+                                ],
+                                extrapolate: "clamp"
+                              })
+                            }
+                          ]
+                        }}
+                      >
+                        <Text style={styles.shoeDescriptionText}>
+                          {slide.shoeDescription}
+                        </Text>
+                      </Animated.View>
+                      <Text style={styles.shoePhraseText}>
+                        {slide.shoePhrase.toUpperCase()}
                       </Text>
-                    </Animated.View>
-                    <Animated.View
-                      style={{
-                        marginBottom: 8,
-                        transform: [
-                          {
-                            translateX: this.scrollX.interpolate({
-                              inputRange: [
-                                deviceWidth * index,
-                                deviceWidth * (index + 1)
-                              ],
-                              outputRange: [0, -deviceWidth * 0.4]
-                            })
-                          }
-                        ]
-                      }}
-                    >
-                      <Text style={styles.shoeNameText}>
-                        {slide.shoeName.toUpperCase()}
-                      </Text>
-                    </Animated.View>
-                    <Animated.View
-                      style={{
-                        transform: [
-                          {
-                            translateX: this.scrollX.interpolate({
-                              inputRange: [
-                                deviceWidth * index,
-                                deviceWidth * (index + 1)
-                              ],
-                              outputRange: [0, -deviceWidth * 0.6]
-                            })
-                          }
-                        ]
-                      }}
-                    >
-                      <Text style={styles.shoeDescriptionText}>
-                        {slide.shoeDescription}
-                      </Text>
-                    </Animated.View>
-                    <Text style={styles.shoePhraseText}>
-                      {slide.shoePhrase.toUpperCase()}
-                    </Text>
-                    <View />
+                      <View />
+                    </LinearGradient>
                   </View>
                   <Animated.View
+                    shouldRasterizeIOS
+                    renderToHardwareTextureAndroid
                     style={[
                       styles.buttonContainer,
                       {
@@ -176,10 +226,16 @@ export default class App extends Component {
                           {
                             translateX: this.scrollX.interpolate({
                               inputRange: [
+                                deviceWidth * (index - 1),
                                 deviceWidth * index,
                                 deviceWidth * (index + 1)
                               ],
-                              outputRange: [0, -deviceWidth * 0.2]
+                              outputRange: [
+                                deviceWidth * 0.2,
+                                0,
+                                -deviceWidth * 0.2
+                              ],
+                              extrapolate: "clamp"
                             })
                           }
                         ]
@@ -210,6 +266,8 @@ export default class App extends Component {
                 </Animated.View>
                 <Animated.View
                   pointerEvents="none"
+                  shouldRasterizeIOS
+                  renderToHardwareTextureAndroid
                   style={[
                     styles.shoeImageContainer,
                     {
@@ -217,10 +275,12 @@ export default class App extends Component {
                         {
                           translateX: this.scrollX.interpolate({
                             inputRange: [
+                              deviceWidth * (index - 1),
                               deviceWidth * index,
                               deviceWidth * (index + 1)
                             ],
-                            outputRange: [0, -deviceWidth * 1]
+                            outputRange: [deviceWidth, 0, -deviceWidth],
+                            extrapolate: "clamp"
                           })
                         }
                       ]
@@ -238,6 +298,8 @@ export default class App extends Component {
           <View style={styles.inActivePageIndicator} />
           <View style={styles.inActivePageIndicator} />
           <Animated.View
+            shouldRasterizeIOS
+            renderToHardwareTextureAndroid
             style={[
               styles.activePageIndicator,
               {
@@ -245,7 +307,8 @@ export default class App extends Component {
                   {
                     translateX: this.scrollX.interpolate({
                       inputRange: [0, deviceWidth, deviceWidth * 2],
-                      outputRange: [0, 24, 48]
+                      outputRange: [0, 24, 48],
+                      extrapolate: "clamp"
                     })
                   },
                   {
@@ -257,7 +320,8 @@ export default class App extends Component {
                         deviceWidth * 1.5,
                         deviceWidth * 2
                       ],
-                      outputRange: [1, 1.5, 1, 1.5, 1]
+                      outputRange: [1, 1.5, 1, 1.5, 1],
+                      extrapolate: "clamp"
                     })
                   }
                 ]
@@ -301,13 +365,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
     backgroundColor: "transparent"
   },
-  gradientImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: deviceWidth - 64,
-    height: deviceHeight * 0.8,
-    resizeMode: "cover"
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    padding: 28,
+    backgroundColor: "transparent",
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15
   },
   nikeImageContainer: {
     flexDirection: "row",
